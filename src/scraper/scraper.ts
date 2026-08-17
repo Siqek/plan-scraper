@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio';
 import type { Element } from 'domhandler';
 
-import { LessonData, LessonDataType, ParsedLessonData, UnparsedLessonData } from "./types.js";
+import { LessonData, LessonDataType, LessonDay, LessonSchedule, ParsedLessonData, UnparsedLessonData } from "./scraper.types.js";
 
 /**
  * class -> teachers
@@ -30,12 +30,12 @@ async function fetchHTML(url: URL): Promise<string> {
     return "";
 }
 
-async function parseClassSchedule(scheduleUrl: URL): Promise<(LessonData[] | null)[][]> {
+async function parseClassSchedule(scheduleUrl: URL): Promise<LessonSchedule> {
 
     const html = await fetchHTML(scheduleUrl);
     const $: cheerio.CheerioAPI = cheerio.load(html);
 
-    const result: (LessonData[] | null)[][] = [];
+    const result: LessonSchedule = [];
 
     // extract all schedule rows and skip the first row that contains only meta data
     const rows = $('table[class="tabela"] tr').not('tr:first');
@@ -45,17 +45,11 @@ async function parseClassSchedule(scheduleUrl: URL): Promise<(LessonData[] | nul
         // extract all lesson cells
         const cells = $(row).find('td[class="l"]');
 
-        const lessons: (LessonData[] | null)[] = [];
+        const lessons: LessonDay = [];
 
         for (const cell of cells) {
 
             const lesson = parseLessonCell($, cell);
-
-            if (lesson === null) {
-                lessons.push(null);
-                continue;
-            }
-
             lessons.push(lesson);
         }
 
