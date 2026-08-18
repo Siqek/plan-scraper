@@ -1,20 +1,7 @@
 import * as cheerio from 'cheerio';
 import type { Element } from 'domhandler';
 
-import { LessonData, LessonDataType, LessonDay, LessonSchedule, ParsedLessonData, UnparsedLessonData } from "./scraper.types.js";
-
-/**
- * class -> teachers
- *      each teacher -> subjects
- *          subject -> amount of lessons
- */
-
-/**
- * class id -> class url -> schedule (html) -> scrape -> [cache?] -> return
- */
-
-
-const TEMP_LINK: string = "https://plan.zs1mm.edu.pl/nauczycielezs1/plany/o26.html";
+import { LessonData, LessonDataType, LessonSchedule, ParsedLessonData, UnparsedLessonData } from "./scraper.types.js";
 
 async function fetchHTML(url: URL): Promise<string> {
 
@@ -35,31 +22,27 @@ async function parseClassSchedule(scheduleUrl: URL): Promise<LessonSchedule> {
     const html = await fetchHTML(scheduleUrl);
     const $: cheerio.CheerioAPI = cheerio.load(html);
 
-    const result: LessonSchedule = [];
+    const DAYS_IN_SCHEDULE = 5;
+    const schedule: LessonSchedule = Array.from({ length: DAYS_IN_SCHEDULE }, () => []);
 
-    // extract all schedule rows and skip the first row that contains only meta data
-    const rows = $('table[class="tabela"] tr').not('tr:first');
+    // skip the first row, which contains only meta data
+    const rows = $('table[class="tabela"] tr').not(':first');
 
     for (const row of rows) {
 
-        // extract all lesson cells
-        const cells = $(row).find('td[class="l"]');
+        for (let dayIndex = 0; dayIndex < DAYS_IN_SCHEDULE; ++dayIndex) {
 
-        const lessons: LessonDay = [];
-
-        for (const cell of cells) {
+            const cell = $(row).find('td[class="l"]').eq(dayIndex);
 
             const lesson = parseLessonCell($, cell);
-            lessons.push(lesson);
+            schedule[dayIndex]?.push(lesson);
         }
-
-        result.push(lessons);
     }
 
-    return result;
+    return schedule;
 }
 
-function parseLessonCell($: cheerio.CheerioAPI, cell: Element): LessonData[] | null {
+function parseLessonCell($: cheerio.CheerioAPI, cell: cheerio.Cheerio<Element>): LessonData[] | null {
 
     if ($(cell).text().replace(/\u00a0/g, '').trim() === '') {
         return null;
@@ -102,6 +85,6 @@ function parseLessonCell($: cheerio.CheerioAPI, cell: Element): LessonData[] | n
     return result;
 }
 
-(async function main() {
-    console.log(await parseClassSchedule(new URL(TEMP_LINK)));
-})();
+export {
+    parseClassSchedule
+};
