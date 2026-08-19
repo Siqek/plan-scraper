@@ -2,20 +2,28 @@
   "name": "plan-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@11.21.0",
+  "packageManager": "pnpm@11.22.0",
   "dependencies": {
     "cheerio": "^1.2.0",
-    "domhandler": "^6.0.1"
+    "cors": "^2.8.6",
+    "domhandler": "^6.0.1",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   }
 }
