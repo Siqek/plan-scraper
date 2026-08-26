@@ -1,23 +1,11 @@
 import * as cheerio from 'cheerio';
 import type { Element } from 'domhandler';
 
-import { LessonData, LessonDataType, LessonSchedule, ParsedLessonData, UnparsedLessonData } from "./scraper.types.js";
+import { LessonData, LessonDataType, LessonSchedule, ParsedLessonData, UnparsedLessonData } from "../types.js";
 
-async function fetchHTML(url: URL): Promise<string> {
+import { fetchHTML } from './fetchHTML.js';
 
-    try {
-        const res = await fetch(url);
-        const html = await res.text();
-        return html;
-
-    } catch (e) {
-        console.error(e);
-    }
-
-    return "";
-}
-
-async function parseClassSchedule(scheduleUrl: URL): Promise<LessonSchedule> {
+export async function parseClassSchedule(scheduleUrl: URL): Promise<LessonSchedule> {
 
     const html = await fetchHTML(scheduleUrl);
     const $: cheerio.CheerioAPI = cheerio.load(html);
@@ -84,7 +72,3 @@ function parseLessonCell($: cheerio.CheerioAPI, cell: cheerio.Cheerio<Element>):
 
     return result;
 }
-
-export {
-    parseClassSchedule
-};

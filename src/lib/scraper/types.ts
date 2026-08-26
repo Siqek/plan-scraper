@@ -22,3 +22,8 @@ export type LessonData = ParsedLessonData | UnparsedLessonData;
 export type LessonSlot = LessonData[] | null;
 export type LessonDay = LessonSlot[];
 export type LessonSchedule = LessonDay[];
+
+export type HrefWithClassName = {
+    href: string;
+    className: string;
+};
